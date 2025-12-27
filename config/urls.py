@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from src.presentation.urls.blood_type_urls import urlpatterns as blood_type_urls
+from src.presentation.urls.donor_urls import urlpatterns as donor_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(blood_type_urls)),
+    path('api/', include(donor_urls)),
 ]
