@@ -18,9 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from src.presentation.urls.blood_type_urls import urlpatterns as blood_type_urls
 from src.presentation.urls.donor_urls import urlpatterns as donor_urls
+from src.presentation.urls.donation_event_urls import urlpatterns as donation_event_urls
+from src.presentation.urls.blood_unit_urls import urlpatterns as blood_unit_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(blood_type_urls)),
     path('api/', include(donor_urls)),
+    path('api/donation-events/', include(donation_event_urls)),
+    path('api/blood-units/', include(blood_unit_urls)),
 ]
