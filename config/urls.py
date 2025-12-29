@@ -16,7 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from src.presentation.urls.blood_type_urls import urlpatterns as blood_type_urls
+from src.presentation.urls.donation_event_urls import urlpatterns as donation_event_urls
+from src.presentation.urls.blood_unit_urls import urlpatterns as blood_unit_urls
+from src.presentation.urls.auth_urls import urlpatterns as auth_urls
+from src.presentation.urls.donor_urls import urlpatterns as donor_urls
+from src.presentation.urls.hospital_urls import urlpatterns as hospital_urls
+from src.presentation.urls.request_urls import urlpatterns as request_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/donation-events/', include(donation_event_urls)),
+    path('api/blood-units/', include(blood_unit_urls)),
+    path('api/auth/', include(auth_urls)),
+    path('api/', include(donor_urls)),
+    path('api/', include(hospital_urls)),
+    path('api/', include(request_urls)),
 ]

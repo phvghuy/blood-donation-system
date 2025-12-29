@@ -5,7 +5,7 @@ from .blood_type_model import BloodTypeModel
 class BloodRequestModel(models.Model):
     STATUS_CHOICES = [
         ("pending", "Chờ duyệt"),
-        ("approved", "Đẫ duyệt"),
+        ("approved", "Đã duyệt"),
         ("rejected", "Từ chối"),
         ("completed", "Hoàn tất"),
     ]
