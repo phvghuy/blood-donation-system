@@ -20,3 +20,14 @@ class BloodUnit:
 
     def mark_as_available(self):
         self.status = "available"
+
+    # Kiểm tra tính hợp lệ khi đổi trạng thái
+    def change_status(self, new_status: str):
+        valid_statuses = ["available", "reserved", "used", "expired"]
+        if new_status not in valid_statuses:
+            raise ValueError(f"Trạng thái '{new_status}' không hợp lệ.")
+
+        if self.status == "used" and new_status == "available":
+            raise ValueError("Không thể tái sử dụng đơn vị máu đã dùng.")
+
+        self.status = new_status

@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 # Import DTO
 from src.application.dto.donation_event_dto import CreateDonationEventInputDTO
@@ -12,8 +13,12 @@ from src.infrastructure.serializers.donation_event_serializer import CreateDonat
 from src.infrastructure.repository_impl.blood_unit_repo_impl import BloodUnitRepositoryImpl
 from src.infrastructure.repository_impl.donation_event_repo_impl import DonationEventRepositoryImpl
 from src.infrastructure.repository_impl.blood_type_repo_impl import BloodTypeRepositoryImpl
+# Import permissions
+from presentation.permissions import IsDonor
 
 class CreateDonationEventView(APIView):
+    permission_classes = [IsAuthenticated, IsDonor]
+
     def post(self, request):
         serializer = CreateDonationEventSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
