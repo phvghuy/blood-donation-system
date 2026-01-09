@@ -8,10 +8,15 @@ class DonorUseCase:
         self.service = service
 
     def create_donor(self, dto: CreateDonorDTO):
+        # Logic Application: Chuyển đổi dữ liệu (String -> Date)
         dob = None
         if dto.date_of_birth:
-            dob = datetime.strptime(dto.date_of_birth, '%Y-%m-%d').date()
+            if isinstance(dto.date_of_birth, str):
+                dob = datetime.strptime(dto.date_of_birth, '%Y-%m-%d').date()
+            else:
+                dob = dto.date_of_birth
 
+        # Gọi Domain Service
         return self.service.create_new_donor(
             user_id=dto.user_id,
             full_name=dto.full_name,
@@ -37,6 +42,7 @@ class DonorUseCase:
     def get_donor_history(self, donor_id: int):
         donor, history_ids = self.service.get_donor_with_history(donor_id)
 
+        # Logic Application: Format dữ liệu trả về cho View
         return {
             "donor": donor,
             "donation_count": len(history_ids),

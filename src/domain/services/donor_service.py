@@ -1,12 +1,14 @@
+from typing import Optional, List, Tuple
+from datetime import date
 from src.domain.repositories.donor_repo import DonorRepository
 from src.domain.models.donor import Donor
-
 
 class DonorService:
     def __init__(self, donor_repo: DonorRepository):
         self.donor_repo = donor_repo
 
-    def create_new_donor(self, user_id, full_name, date_of_birth, gender, phone, address, blood_type_id):
+    def create_new_donor(self, user_id: int, full_name: str, date_of_birth: Optional[date],
+                         gender: str, phone: str, address: str, blood_type_id: Optional[int]) -> Donor:
         new_donor = Donor(
             id=None,
             user_id=user_id,
@@ -19,7 +21,9 @@ class DonorService:
         )
         return self.donor_repo.save(new_donor)
 
-    def update_donor_details(self, donor_id, full_name=None, phone=None, address=None, blood_type_id=None):
+    def update_donor_details(self, donor_id: int, full_name: Optional[str] = None,
+                             phone: Optional[str] = None, address: Optional[str] = None,
+                             blood_type_id: Optional[int] = None) -> Donor:
         current_donor = self.donor_repo.get_by_id(donor_id)
         if not current_donor:
             raise ValueError("Donor does not exist")
@@ -35,10 +39,10 @@ class DonorService:
 
         return self.donor_repo.update(current_donor)
 
-    def search_by_blood_type(self, blood_type_id: int):
+    def search_by_blood_type(self, blood_type_id: int) -> List[Donor]:
         return self.donor_repo.list_by_blood_type(blood_type_id)
 
-    def get_donor_with_history(self, donor_id: int):
+    def get_donor_with_history(self, donor_id: int) -> Tuple[Donor, List[int]]:
         donor = self.donor_repo.get_by_id(donor_id)
         if not donor:
             raise ValueError("Donor not found")

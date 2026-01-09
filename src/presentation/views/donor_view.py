@@ -4,7 +4,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from src.presentation.permissions import IsAdmin
 
+# Import đầy đủ các lớp cần thiết
 from src.infrastructure.repository_impl.donor_repo_impl import DonorRepositoryImpl
+from src.domain.services.donor_service import DonorService
 from src.application.use_cases.donor_usecase import DonorUseCase
 from src.application.dto.donor_dto import CreateDonorDTO, UpdateDonorDTO
 from src.infrastructure.serializers.donor_serializer import DonorResponseSerializer, CreateDonorRequestSerializer
@@ -15,8 +17,10 @@ class DonorView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.repo = DonorRepositoryImpl()
-        self.use_case = DonorUseCase(self.repo)
+        # --- WIRING (Đấu nối dây) ---
+        self.repo = DonorRepositoryImpl()  # 1. Repository
+        self.service = DonorService(self.repo)  # 2. Service (Nhận Repo)
+        self.use_case = DonorUseCase(self.service)  # 3. UseCase (Nhận Service)
 
     # 1. Tra cứu danh sách theo nhóm máu
     def get(self, request):
@@ -31,9 +35,13 @@ class DonorView(APIView):
     def post(self, request):
         serializer = CreateDonorRequestSerializer(data=request.data)
         if serializer.is_valid():
-            dto = CreateDonorDTO(**serializer.validated_data)
             try:
-                dto.date_of_birth = str(dto.date_of_birth)
+                # Validate DTO
+                dto = CreateDonorDTO(**serializer.validated_data)
+
+                # Để đảm bảo tương thích với logic parse date trong UseCase
+                if dto.date_of_birth:
+                    dto.date_of_birth = str(dto.date_of_birth)
 
                 new_donor = self.use_case.create_donor(dto)
                 return Response({"id": new_donor.id, "msg": "Created"}, status=status.HTTP_201_CREATED)
@@ -47,16 +55,25 @@ class DonorDetailView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # --- WIRING (Đấu nối dây) ---
         self.repo = DonorRepositoryImpl()
-        self.use_case = DonorUseCase(self.repo)
+        self.service = DonorService(self.repo)
+        self.use_case = DonorUseCase(self.service)
 
     # 3. Xem lịch sử hiến máu
     def get(self, request, pk):
         try:
             result = self.use_case.get_donor_history(pk)
+
+            # Xử lý serialize dữ liệu trả về
+            donor_data = result['donor']
+            if hasattr(donor_data, 'full_name'):  # Nếu là Object Entity
+                donor_data = DonorResponseSerializer(donor_data).data
+            else:  # Nếu là dict (fallback)
+                donor_data = donor_data.__dict__
+
             data = {
-                "donor": DonorResponseSerializer(result['donor']).data if hasattr(result['donor'], 'full_name') else result[
-                    'donor'].__dict__,
+                "donor": donor_data,
                 "history": result['donation_unit_ids']
             }
             return Response(data, status=status.HTTP_200_OK)
@@ -65,6 +82,7 @@ class DonorDetailView(APIView):
 
     # 4. Cập nhật thông tin
     def put(self, request, pk):
+        # DTO mapping
         dto = UpdateDonorDTO(donor_id=pk, **request.data)
         try:
             updated_donor = self.use_case.update_donor_info(dto)

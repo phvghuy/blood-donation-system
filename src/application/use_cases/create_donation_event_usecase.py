@@ -5,17 +5,20 @@ class CreateDonationEventUseCase:
     def __init__(self, service: DonationEventService):
         self.service = service
 
-    def execute(self, input_dto: CreateDonationEventInputDTO):
-        saved_event, saved_blood_unit = self.service.process_new_donation(
-            donor_id=input_dto.donor_id,
-            blood_type_id=input_dto.blood_type_id,
-            donation_date=input_dto.donation_date,
-            location=input_dto.location
+    def execute(self, dto: CreateDonationEventInputDTO):
+        # Gọi service xử lý
+        event, unit = self.service.process_new_donation(
+            donor_id=dto.donor_id,
+            blood_type_name=dto.blood_type_name, # DTO nên chứa tên (VD: "A+")
+            donation_date=dto.donation_date,
+            location=dto.location
         )
 
+        # Trả về kết quả dạng dict hoặc OutputDTO
         return {
-            "event_id": saved_event.id,
-            "blood_unit_id": saved_blood_unit.id,
-            "expiry_date": saved_blood_unit.expiry_date,
-            "status": saved_blood_unit.status
+            "message": "Tạo sự kiện hiến máu thành công",
+            "event_id": event.id,
+            "blood_unit_id": unit.id,
+            "expiry_date": unit.expiry_date,
+            "status": unit.status
         }

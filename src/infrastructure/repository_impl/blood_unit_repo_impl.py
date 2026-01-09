@@ -13,7 +13,8 @@ class BloodUnitRepositoryImpl(BloodUnitRepository):
             donor_id=orm_model.donor_id,
             donation_date=orm_model.donation_date,
             expiry_date=orm_model.expiry_date,
-            status=orm_model.status
+            status=orm_model.status,
+            donor_name=orm_model.donor.full_name
         )
 
     def get_all(self) -> List[BloodUnit]:
