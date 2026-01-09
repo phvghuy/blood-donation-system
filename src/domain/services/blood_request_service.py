@@ -11,7 +11,6 @@ class BloodRequestService:
         if quantity <= 0:
             raise ValueError("Số lượng yêu cầu cần lớn hơn 0")
 
-        # Gọi Repo để lưu
         return self.repo.create_request(user_id, blood_type_id, quantity)
 
     def get_hospital_history(self, user_id: int) -> List[BloodRequest]:

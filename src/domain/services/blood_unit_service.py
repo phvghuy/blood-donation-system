@@ -7,7 +7,6 @@ class BloodUnitService:
         self.repo = repo
 
     def get_all_blood_units(self) -> List[BloodUnit]:
-        # Repository sẽ trả về List[Entity], không phải QuerySet
         return self.repo.get_all()
 
     def update_status(self, unit_id: int, new_status: str):
@@ -15,9 +14,7 @@ class BloodUnitService:
         if not unit:
             raise ValueError("Đơn vị máu không tồn tại")
 
-        # Gọi phương thức business trong Entity
         unit.change_status(new_status)
 
-        # Lưu lại thông qua Repo
         self.repo.update(unit)
         return unit

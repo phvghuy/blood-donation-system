@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from src.presentation.permissions import IsAdmin, IsHospital
 
-# Imports
 from src.infrastructure.repository_impl.blood_request_repo_impl import BloodRequestRepositoryImpl
 from src.domain.services.blood_request_service import BloodRequestService
 from src.application.use_cases.blood_request_usecase import BloodRequestUseCase
@@ -21,21 +20,18 @@ class HospitalRequestView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # --- WIRING (Sửa lại đoạn này) ---
         self.repo = BloodRequestRepositoryImpl()
         self.service = BloodRequestService(self.repo) # Inject Repo vào Service
         self.use_case = BloodRequestUseCase(self.service) # Inject Service vào UseCase
 
     def get(self, request):
         requests = self.use_case.get_hospital_history(request.user.id)
-        # Serialize list Entity
         data = [RequestResponseSerializer(r).data for r in requests]
         return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = CreateRequestSerializer(data=request.data)
         if serializer.is_valid():
-            # Mapping dữ liệu từ Serializer sang DTO
             dto = CreateRequestDTO(
                 user_id=request.user.id,
                 blood_type_id=serializer.validated_data['blood_type_id'],
@@ -55,7 +51,6 @@ class AdminRequestView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # --- WIRING TƯƠNG TỰ ---
         self.repo = BloodRequestRepositoryImpl()
         self.service = BloodRequestService(self.repo)
         self.use_case = BloodRequestUseCase(self.service)

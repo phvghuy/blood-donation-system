@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from src.presentation.permissions import IsAdmin
 
-# Import các thành phần
 from src.infrastructure.repository_impl.hospital_repo_impl import HospitalRepositoryImpl
 from src.domain.services.hospital_service import HospitalService
 from src.application.use_cases.hospital_usecase import HospitalUseCase
@@ -20,10 +19,9 @@ class HospitalListView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # --- WIRING (Đấu nối) ---
         self.repo = HospitalRepositoryImpl()
-        self.service = HospitalService(self.repo)  # Service nhận Repo
-        self.use_case = HospitalUseCase(self.service)  # UseCase nhận Service
+        self.service = HospitalService(self.repo)
+        self.use_case = HospitalUseCase(self.service)
 
     # Lấy danh sách bệnh viện
     def get(self, request):
@@ -55,7 +53,6 @@ class HospitalDetailView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # --- WIRING (Đấu nối) ---
         self.repo = HospitalRepositoryImpl()
         self.service = HospitalService(self.repo)
         self.use_case = HospitalUseCase(self.service)

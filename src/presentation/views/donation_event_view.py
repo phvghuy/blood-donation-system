@@ -7,12 +7,10 @@ from src.application.dto.donation_event_dto import CreateDonationEventInputDTO
 from src.infrastructure.serializers.donation_event_serializer import CreateDonationEventSerializer
 from src.presentation.permissions import IsAdmin
 
-# Import các lớp Implementation
 from src.infrastructure.repository_impl.blood_unit_repo_impl import BloodUnitRepositoryImpl
 from src.infrastructure.repository_impl.donation_event_repo_impl import DonationEventRepositoryImpl
 from src.infrastructure.repository_impl.blood_type_repo_impl import BloodTypeRepositoryImpl
 
-# Import Service và UseCase
 from src.domain.services.donation_event_service import DonationEventService
 from src.application.use_cases.create_donation_event_usecase import CreateDonationEventUseCase
 
@@ -22,7 +20,6 @@ class CreateDonationEventView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # --- WIRING (Đấu nối các thành phần) ---
         # 1. Khởi tạo 3 Repositories cần thiết
         self.unit_repo = BloodUnitRepositoryImpl()
         self.event_repo = DonationEventRepositoryImpl()
@@ -41,8 +38,6 @@ class CreateDonationEventView(APIView):
     def post(self, request):
         serializer = CreateDonationEventSerializer(data=request.data)
         if serializer.is_valid():
-            # Tạo DTO từ dữ liệu đã validate
-            # Lưu ý: Serializer trả về 'blood_type' là string (VD: "A+")
             dto = CreateDonationEventInputDTO(
                 donor_id=serializer.validated_data['donor_id'],
                 blood_type_name=serializer.validated_data['blood_type'],
@@ -51,12 +46,10 @@ class CreateDonationEventView(APIView):
             )
 
             try:
-                # Thực thi Use Case
                 result = self.use_case.execute(dto)
                 return Response(result, status=status.HTTP_201_CREATED)
 
             except ValueError as e:
-                # Bắt lỗi logic từ Service (ví dụ: Sai nhóm máu)
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
