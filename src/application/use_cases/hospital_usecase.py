@@ -2,7 +2,6 @@ from src.application.dto.hospital_dto import CreateHospitalDTO
 from src.domain.services.hospital_service import HospitalService
 
 class HospitalUseCase:
-    # Inject Service thay vì Repo
     def __init__(self, service: HospitalService):
         self.service = service
 

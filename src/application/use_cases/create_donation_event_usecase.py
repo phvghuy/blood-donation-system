@@ -6,15 +6,13 @@ class CreateDonationEventUseCase:
         self.service = service
 
     def execute(self, dto: CreateDonationEventInputDTO):
-        # Gọi service xử lý
         event, unit = self.service.process_new_donation(
             donor_id=dto.donor_id,
-            blood_type_name=dto.blood_type_name, # DTO nên chứa tên (VD: "A+")
+            blood_type_name=dto.blood_type_name,
             donation_date=dto.donation_date,
             location=dto.location
         )
 
-        # Trả về kết quả dạng dict hoặc OutputDTO
         return {
             "message": "Tạo sự kiện hiến máu thành công",
             "event_id": event.id,

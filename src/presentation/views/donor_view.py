@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from src.presentation.permissions import IsAdmin
 
-# Import đầy đủ các lớp cần thiết
 from src.infrastructure.repository_impl.donor_repo_impl import DonorRepositoryImpl
 from src.domain.services.donor_service import DonorService
 from src.application.use_cases.donor_usecase import DonorUseCase
@@ -17,10 +16,9 @@ class DonorView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # --- WIRING (Đấu nối dây) ---
-        self.repo = DonorRepositoryImpl()  # 1. Repository
-        self.service = DonorService(self.repo)  # 2. Service (Nhận Repo)
-        self.use_case = DonorUseCase(self.service)  # 3. UseCase (Nhận Service)
+        self.repo = DonorRepositoryImpl()
+        self.service = DonorService(self.repo)
+        self.use_case = DonorUseCase(self.service)
 
     # 1. Tra cứu danh sách theo nhóm máu
     def get(self, request):
@@ -36,10 +34,8 @@ class DonorView(APIView):
         serializer = CreateDonorRequestSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                # Validate DTO
                 dto = CreateDonorDTO(**serializer.validated_data)
 
-                # Để đảm bảo tương thích với logic parse date trong UseCase
                 if dto.date_of_birth:
                     dto.date_of_birth = str(dto.date_of_birth)
 
@@ -55,7 +51,6 @@ class DonorDetailView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # --- WIRING (Đấu nối dây) ---
         self.repo = DonorRepositoryImpl()
         self.service = DonorService(self.repo)
         self.use_case = DonorUseCase(self.service)
@@ -65,11 +60,10 @@ class DonorDetailView(APIView):
         try:
             result = self.use_case.get_donor_history(pk)
 
-            # Xử lý serialize dữ liệu trả về
             donor_data = result['donor']
-            if hasattr(donor_data, 'full_name'):  # Nếu là Object Entity
+            if hasattr(donor_data, 'full_name'):
                 donor_data = DonorResponseSerializer(donor_data).data
-            else:  # Nếu là dict (fallback)
+            else:
                 donor_data = donor_data.__dict__
 
             data = {
@@ -82,7 +76,6 @@ class DonorDetailView(APIView):
 
     # 4. Cập nhật thông tin
     def put(self, request, pk):
-        # DTO mapping
         dto = UpdateDonorDTO(donor_id=pk, **request.data)
         try:
             updated_donor = self.use_case.update_donor_info(dto)

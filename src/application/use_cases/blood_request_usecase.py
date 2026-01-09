@@ -4,7 +4,6 @@ from src.domain.services.blood_request_service import BloodRequestService
 from src.domain.models.blood_request import BloodRequest
 
 class BloodRequestUseCase:
-    # Inject Service vào đây
     def __init__(self, service: BloodRequestService):
         self.service = service
 

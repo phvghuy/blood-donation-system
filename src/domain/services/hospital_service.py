@@ -8,7 +8,6 @@ class HospitalService:
         self.repo = repo
 
     def create_new_hospital(self, username, password, email, name, phone, address) -> Hospital:
-        # Tại đây có thể thêm logic kiểm tra trùng email trước khi tạo nếu cần
         return self.repo.create_hospital(
             username=username,
             password=password,
@@ -19,8 +18,6 @@ class HospitalService:
         )
 
     def remove_hospital(self, hospital_id: int) -> bool:
-        # Có thể thêm logic kiểm tra: Bệnh viện còn request nào đang pending không?
-        # Nếu có thì không cho xóa.
         deleted = self.repo.delete_hospital(hospital_id)
         if not deleted:
             raise ValueError(f"Hospital with id {hospital_id} does not exist or could not be deleted")
