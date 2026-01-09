@@ -9,6 +9,7 @@ class BloodUnit:
     donation_date: date = None
     expiry_date: date = None
     status: str = "available"
+    donor_name: str = "Ẩn danh"
 
     def calculate_expiry_date(self):
         """

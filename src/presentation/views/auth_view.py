@@ -18,7 +18,9 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
 
         dto = RegisterDTO(**serializer.validated_data)
-        user = AuthUseCase.register(dto)
+
+        usecase = AuthUseCase()
+        user = usecase.register(dto)
 
         role = user.groups.first().name if user.groups.exists() else None
 
@@ -37,6 +39,8 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
 
         dto = LoginDTO(**serializer.validated_data)
-        token_data = AuthUseCase.login(dto)
+
+        usecase = AuthUseCase()
+        token_data = usecase.login(dto)
 
         return Response(token_data, status=status.HTTP_200_OK)

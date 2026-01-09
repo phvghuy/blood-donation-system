@@ -1,10 +1,14 @@
+from typing import List
 from src.domain.repositories.hospital_repo import HospitalRepository
+from src.domain.models.hospital import Hospital
+
 
 class HospitalService:
     def __init__(self, repo: HospitalRepository):
         self.repo = repo
 
-    def register_hospital(self, username, password, email, name, phone, address):
+    def create_new_hospital(self, username, password, email, name, phone, address) -> Hospital:
+        # Tại đây có thể thêm logic kiểm tra trùng email trước khi tạo nếu cần
         return self.repo.create_hospital(
             username=username,
             password=password,
@@ -14,8 +18,19 @@ class HospitalService:
             address=address
         )
 
-    def remove_hospital(self, hospital_id: int):
-        return self.repo.delete_hospital(hospital_id)
+    def remove_hospital(self, hospital_id: int) -> bool:
+        # Có thể thêm logic kiểm tra: Bệnh viện còn request nào đang pending không?
+        # Nếu có thì không cho xóa.
+        deleted = self.repo.delete_hospital(hospital_id)
+        if not deleted:
+            raise ValueError(f"Hospital with id {hospital_id} does not exist or could not be deleted")
+        return True
 
-    def list_all_hospitals(self):
+    def get_all_hospitals(self) -> List[Hospital]:
         return self.repo.get_all_hospitals()
+
+    def get_hospital_by_id(self, hospital_id: int) -> Hospital:
+        hospital = self.repo.get_hospital_by_id(hospital_id)
+        if not hospital:
+            raise ValueError(f"Hospital with id {hospital_id} not found")
+        return hospital

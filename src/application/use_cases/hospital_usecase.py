@@ -2,11 +2,12 @@ from src.application.dto.hospital_dto import CreateHospitalDTO
 from src.domain.services.hospital_service import HospitalService
 
 class HospitalUseCase:
+    # Inject Service thay vì Repo
     def __init__(self, service: HospitalService):
         self.service = service
 
     def create_hospital(self, dto: CreateHospitalDTO):
-        return self.service.register_hospital(
+        return self.service.create_new_hospital(
             username=dto.username,
             password=dto.password,
             email=dto.email,
@@ -19,4 +20,4 @@ class HospitalUseCase:
         return self.service.remove_hospital(hospital_id)
 
     def get_list_hospitals(self):
-        return self.service.list_all_hospitals()
+        return self.service.get_all_hospitals()

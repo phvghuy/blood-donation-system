@@ -4,7 +4,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from src.presentation.permissions import IsAdmin, IsHospital
 
+# Imports
 from src.infrastructure.repository_impl.blood_request_repo_impl import BloodRequestRepositoryImpl
+from src.domain.services.blood_request_service import BloodRequestService
 from src.application.use_cases.blood_request_usecase import BloodRequestUseCase
 from src.application.dto.request_dto import CreateRequestDTO, ProcessRequestDTO
 from src.infrastructure.serializers.request_serializer import (
@@ -19,22 +21,25 @@ class HospitalRequestView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # --- WIRING (Sửa lại đoạn này) ---
         self.repo = BloodRequestRepositoryImpl()
-        self.use_case = BloodRequestUseCase(self.repo)
+        self.service = BloodRequestService(self.repo) # Inject Repo vào Service
+        self.use_case = BloodRequestUseCase(self.service) # Inject Service vào UseCase
 
-    # Xem danh sách yêu cầu của bệnh viện
     def get(self, request):
         requests = self.use_case.get_hospital_history(request.user.id)
+        # Serialize list Entity
         data = [RequestResponseSerializer(r).data for r in requests]
         return Response(data, status=status.HTTP_200_OK)
 
-    # Gửi yêu cầu mới
     def post(self, request):
         serializer = CreateRequestSerializer(data=request.data)
         if serializer.is_valid():
+            # Mapping dữ liệu từ Serializer sang DTO
             dto = CreateRequestDTO(
                 user_id=request.user.id,
-                **serializer.validated_data
+                blood_type_id=serializer.validated_data['blood_type_id'],
+                quantity=serializer.validated_data['quantity']
             )
             try:
                 new_req = self.use_case.send_request(dto)
@@ -50,16 +55,16 @@ class AdminRequestView(APIView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # --- WIRING TƯƠNG TỰ ---
         self.repo = BloodRequestRepositoryImpl()
-        self.use_case = BloodRequestUseCase(self.repo)
+        self.service = BloodRequestService(self.repo)
+        self.use_case = BloodRequestUseCase(self.service)
 
-    # Xem danh sách Pending
     def get(self, request):
         requests = self.use_case.get_pending_requests()
         data = [RequestResponseSerializer(r).data for r in requests]
         return Response(data, status=status.HTTP_200_OK)
 
-    # Duyệt hoặc Từ chối
     def put(self, request, pk):
         serializer = ProcessRequestSerializer(data=request.data)
         if serializer.is_valid():

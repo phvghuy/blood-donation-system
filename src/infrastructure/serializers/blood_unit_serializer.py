@@ -3,21 +3,18 @@ from src.infrastructure.orm.blood_unit_model import BloodUnitModel
 
 
 class BloodUnitResponseSerializer(serializers.ModelSerializer):
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
-    donor_name = serializers.CharField(source='donor.full_name', default="Ẩn danh", read_only=True)
-    blood_type_display = serializers.StringRelatedField(source='blood_type', read_only=True)
+    donor_name = serializers.CharField(read_only=True)
+    blood_type = serializers.CharField(read_only=True)
 
     class Meta:
         model = BloodUnitModel
         fields = [
             'id',
             'donor_name',
-            'blood_type_display',
+            'blood_type',
             'donation_date',
             'expiry_date',
             'status',
-            'status_display',
-            'created_at'
         ]
 
 
